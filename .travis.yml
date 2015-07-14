@@ -1,0 +1,7 @@
+language: java
+sudo: false
+script: ./gradlew clean build --info --stacktrace
+cache:
+  directories:
+  - $HOME/.gradle
+  - $HOME/.m2
