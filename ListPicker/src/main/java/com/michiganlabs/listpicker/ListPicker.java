@@ -71,7 +71,6 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         // Find indicies of start/end of actual list content
         paddingItems = itemsToShow / 2;
         listStart = paddingItems;
-        listEnd = adapter.getCount() - listStart - 1;
 
         selectionBackground = a.getColor(
             R.styleable.ListPicker_selectionBackground,
@@ -83,7 +82,7 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         );
         a.recycle();
 
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.picker_view, this, true);
 
         listView = (ListView) findViewById(R.id.listview);
@@ -159,6 +158,7 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
 
     public void setItems(ArrayList<CharSequence> items) {
         adapter = new ListPickerListAdapter(context, R.layout.list_item, items);
+        listEnd = adapter.getCount() - listStart - 1;
     }
 
     public CharSequence getSelected() {
