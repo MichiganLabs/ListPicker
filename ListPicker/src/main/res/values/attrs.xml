@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ListPicker">
-        <attr name="array" format="integer"/>
         <attr name="itemsToShow" format="integer"/>
         <attr name="selectionForeground" format="color"/>
         <attr name="selectionBackground" format="color"/>

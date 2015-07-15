@@ -53,17 +53,6 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
             R.styleable.ListPicker
         );
 
-        int arrayResId = a.getResourceId(R.styleable.ListPicker_array, 0);
-        if (arrayResId > 0) {
-            CharSequence[] arr = getResources().getStringArray(
-                a.getResourceId(R.styleable.ListPicker_array, 0)
-            );
-            ArrayList<CharSequence> items = new ArrayList<>(Arrays.asList(arr));
-            setItems(items);
-        } else {
-            setItems(new ArrayList<CharSequence>());
-        }
-
         itemsToShow = a.getInt(R.styleable.ListPicker_itemsToShow, -1);
         if (itemsToShow < 3) {
             // 3 is the minimum
@@ -150,11 +139,11 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         listEnd = adapter.getCount() - listStart - 1;
     }
 
-    public CharSequence getSelected() {
+    public <T> T getSelected() {
         if (adapter == null) {
-            return "";
+            return null;
         }  {
-            return adapter.getItem(firstVisibleItem + paddingItems);
+            return (T) adapter.getItem(firstVisibleItem + paddingItems);
         }
     }
 
@@ -179,23 +168,30 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         }
     }
 
-    private class ListPickerListAdapter extends ArrayAdapter<String> {
+    private class ListPickerListAdapter<T> extends ArrayAdapter<T> {
 
         private class ViewHolder {
             TextView text;
         }
 
-        private ArrayList<String> items;
+        private class EmptyItem {
+            @Override
+            public String toString() {
+                return "";
+            }
+        }
 
-        public ListPickerListAdapter(Context context, int textViewResourceId, ArrayList<String> items) {
+        private ArrayList<T> items;
+
+        public ListPickerListAdapter(Context context, int textViewResourceId, ArrayList<T> items) {
             super(context, textViewResourceId, items);
             this.items = items;
 
             // Pad start/end of list with empty items so that list is scrollable to have the first/last item be in the
             // middle of the scrollview.
             for (int i = 0; i < paddingItems; i++) {
-                this.items.add("");
-                this.items.add(0, "");
+                this.items.add((T) new EmptyItem());
+                this.items.add(0, (T) new EmptyItem());
             }
         }
 
@@ -238,7 +234,7 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
             }
 
             if (viewHolder != null) {
-                viewHolder.text.setText("" + items.get(position));
+                viewHolder.text.setText(items.get(position).toString());
 
                 // Resize cell to
                 if (viewHolder.text.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
