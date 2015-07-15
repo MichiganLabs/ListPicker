@@ -1,5 +1,8 @@
 # ListPicker
 
+[![Build Status](https://travis-ci.org/MichiganLabs/ListPicker.svg?branch=v0.1.0)](https://travis-ci.org/MichiganLabs/ListPicker)
+[![jitpack](https://img.shields.io/github/tag/michiganlabs/listpicker.svg?label=JitPack)](https://jitpack.io/#michiganlabs/listpicker/)
+
 It's like a [`NumberPicker`][numberpicker], but shows a selectable number of items at a time.
 
 ![screenshot](http://i.imgur.com/dCdu0Hw.png)
