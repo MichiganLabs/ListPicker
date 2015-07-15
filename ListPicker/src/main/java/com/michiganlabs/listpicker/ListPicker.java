@@ -48,11 +48,16 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
             R.styleable.ListPicker
         );
 
-        CharSequence[] arr = getResources().getStringArray(
-            a.getResourceId(R.styleable.ListPicker_array, 0)
-        );
-        ArrayList<CharSequence> items = new ArrayList<>(Arrays.asList(arr));
-        setItems(items);
+        int arrayResId = a.getResourceId(R.styleable.ListPicker_array, 0);
+        if (arrayResId > 0) {
+            CharSequence[] arr = getResources().getStringArray(
+                a.getResourceId(R.styleable.ListPicker_array, 0)
+            );
+            ArrayList<CharSequence> items = new ArrayList<>(Arrays.asList(arr));
+            setItems(items);
+        } else {
+            setItems(new ArrayList<CharSequence>());
+        }
 
         itemsToShow = a.getInt(R.styleable.ListPicker_itemsToShow, -1);
         if (itemsToShow < 3) {

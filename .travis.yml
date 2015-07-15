@@ -1,7 +1,12 @@
-language: java
+language: android
+android:
+  components:
+    - build-tools-22.0.1
+    - android-22
 sudo: false
-script: ./gradlew clean build --info --stacktrace
+script:
+  - ./gradlew clean build --info --stacktrace
 cache:
   directories:
-  - $HOME/.gradle
-  - $HOME/.m2
+    - $HOME/.gradle
+    - $HOME/.m2

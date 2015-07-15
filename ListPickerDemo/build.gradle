@@ -1,3 +1,5 @@
+apply plugin: 'com.android.application'
+
 buildscript {
     repositories {
         jcenter()
@@ -7,8 +9,29 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        jcenter()
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.michiganlabs.listpickerdemo"
+        minSdkVersion 9
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
     }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile project(':ListPicker')
 }
