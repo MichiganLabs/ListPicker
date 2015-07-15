@@ -84,13 +84,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (position < listStart) {
-            position = listStart;
-        } else if (position > listEnd) {
-            position = listEnd;
-        }
-
-        setSelectedIndex(position);
+        setSelectedIndex(position - paddingItems);
         listView.setItemChecked(position, true);
 
         if (listener != null) {
@@ -116,9 +110,6 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
             listView.setFadingEdgeLength(cellHeight);
             listView.setAdapter(adapter);
-
-            // Default item selected is middle item
-            setSelectedIndex(adapter.getCount() / 2);
 
             listView.setOnScrollListener(new SnappingListener());
         }
@@ -151,9 +142,9 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
     public T getItemAtIndex(int index) {
         if (adapter != null) {
-            int itemIndex = index + listStart;
-            if (itemIndex >= listStart && itemIndex <= listEnd) {
-                return adapter.getItem(itemIndex);
+            index += listStart;
+            if (index >= listStart && index <= listEnd) {
+                return adapter.getItem(index);
             } else {
                 throw new ArrayIndexOutOfBoundsException();
             }
@@ -162,8 +153,8 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
     }
 
     public void setSelectedIndex(int index) {
-        int itemIndex = index + listStart;
-        if (itemIndex >= listStart && itemIndex <= listEnd) {
+        index += listStart;
+        if (index >= listStart && index <= listEnd) {
             firstVisibleItem = index;
             scrollListViewToPositionFromTop(listView, firstVisibleItem - paddingItems, 150);
         }
