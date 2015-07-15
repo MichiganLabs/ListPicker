@@ -137,22 +137,23 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         if (adapter == null) {
             return null;
         }  {
-            return adapter.getItem(firstVisibleItem + paddingItems);
+            return adapter.getItem(getSelectedIndex() + paddingItems);
         }
     }
 
     public int getSelectedIndex() {
         if (adapter == null) {
-            return 0;
+            return -1;
         } else {
-            return firstVisibleItem + paddingItems;
+            return firstVisibleItem - paddingItems;
         }
     }
 
     public T getItemAtIndex(int index) {
         if (adapter != null) {
-            if (index >= 0 && index <= listEnd) {
-                return adapter.getItem(index);
+            int itemIndex = index + listStart;
+            if (itemIndex >= listStart && itemIndex <= listEnd) {
+                return adapter.getItem(itemIndex);
             } else {
                 throw new ArrayIndexOutOfBoundsException();
             }
@@ -160,16 +161,20 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         return null;
     }
 
-    @TargetApi(11)
     public void setSelectedIndex(int index) {
-        if (index >= 0 || index < adapter.getCount()) {
+        int itemIndex = index + listStart;
+        if (itemIndex >= listStart && itemIndex <= listEnd) {
             firstVisibleItem = index;
+            scrollListViewToPositionFromTop(listView, firstVisibleItem - paddingItems, 150);
+        }
+    }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                listView.setSelection(firstVisibleItem - paddingItems);
-            } else {
-                listView.smoothScrollToPositionFromTop(firstVisibleItem - paddingItems, -1, 200);
-            }
+    @TargetApi(11)
+    private void scrollListViewToPositionFromTop(AbsListView view, int position, int duration) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            view.setSelection(position);
+        } else {
+            view.smoothScrollToPositionFromTop(position, 0, duration);
         }
     }
 
@@ -298,14 +303,5 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) { }
-
-        @TargetApi(11)
-        private void scrollListViewToPositionFromTop(AbsListView view, int position, int duration) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                view.setSelection(position);
-            } else {
-                view.smoothScrollToPositionFromTop(position, 0, duration);
-            }
-        }
     }
 }
