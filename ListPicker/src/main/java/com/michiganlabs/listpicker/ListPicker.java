@@ -14,6 +14,7 @@ import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class ListPicker extends RelativeLayout implements AdapterView.OnItemClickListener,
@@ -42,6 +43,10 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
     public ListPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+
+        if (isInEditMode()) {
+            return;
+        }
 
         TypedArray a = context.obtainStyledAttributes(
             attrs,
@@ -100,6 +105,10 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
 
         setSelectedIndex(position);
         listView.setItemChecked(position, true);
+
+        if (listener != null) {
+            listener.onItemSelected(getSelectedIndex());
+        }
     }
 
     @Override
@@ -111,8 +120,7 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
-        // we set the listView here, because we need to calculate the cells size, only
-        // after listView already has height
+
         if (!setListView && adapter != null) {
             setListView = true;
 
@@ -122,33 +130,10 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
             listView.setFadingEdgeLength(cellHeight);
             listView.setAdapter(adapter);
 
-            // Default item selected is middle
+            // Default item selected is middle item
             setSelectedIndex(adapter.getCount() / 2);
 
-            listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {
-                    if (scrollState == SCROLL_STATE_IDLE) {
-                        View child = view.getChildAt(0);    // first visible child
-                        if (child != null) {
-                            int firstItem = listView.getFirstVisiblePosition();
-                            // set this initially, as required by the docs
-                            Rect r = new Rect(0, 0, child.getWidth(), child.getHeight());
-                            double height = child.getHeight() * 1.0;
-
-                            view.getChildVisibleRect(child, r, null);
-                            if (Math.abs(r.height()) < (int) height / 2) {
-                                // show next child
-                                firstItem++;
-                            }
-                            setSelectedIndex(firstItem + paddingItems);
-                        }
-                    }
-                }
-
-                @Override
-                public void onScroll(AbsListView view, int firstVisible, int visibleItemCount, int totalItemCount) { }
-            });
+            listView.setOnScrollListener(new SnappingListener());
         }
     }
 
@@ -156,8 +141,12 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         this.listener = listener;
     }
 
-    public void setItems(ArrayList<CharSequence> items) {
-        adapter = new ListPickerListAdapter(context, R.layout.list_item, items);
+    public <T> void setItems(List<T> items) {
+        ArrayList<String> itemStrings = new ArrayList<>();
+        for (T item : items) {
+            itemStrings.add(item.toString());
+        }
+        adapter = new ListPickerListAdapter(context, R.layout.list_item, itemStrings);
         listEnd = adapter.getCount() - listStart - 1;
     }
 
@@ -187,22 +176,18 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
             } else {
                 listView.smoothScrollToPositionFromTop(firstVisibleItem - paddingItems, -1, 200);
             }
-
-            if (listener != null) {
-                listener.onItemSelected(getSelectedIndex());
-            }
         }
     }
 
-    private class ListPickerListAdapter extends ArrayAdapter<CharSequence> {
+    private class ListPickerListAdapter extends ArrayAdapter<String> {
 
         private class ViewHolder {
             TextView text;
         }
 
-        private ArrayList<CharSequence> items;
+        private ArrayList<String> items;
 
-        public ListPickerListAdapter(Context context, int textViewResourceId, ArrayList<CharSequence> items) {
+        public ListPickerListAdapter(Context context, int textViewResourceId, ArrayList<String> items) {
             super(context, textViewResourceId, items);
             this.items = items;
 
@@ -274,6 +259,47 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
             }
 
             return convertView;
+        }
+    }
+
+    private class SnappingListener implements AbsListView.OnScrollListener {
+        boolean scrolling = false;
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            switch (scrollState) {
+                case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                    if (scrolling){
+                        scrolling = false;
+
+                        // get first visible item
+                        View itemView = view.getChildAt(0);
+                        int top = Math.abs(itemView.getTop()); // top is a negative value
+                        int bottom = Math.abs(itemView.getBottom());
+                        if (top >= bottom){
+                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition() + 1, 150);
+                        } else {
+                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition(), 150);
+                        }
+                    }
+                    break;
+                case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+                case AbsListView.OnScrollListener.SCROLL_STATE_FLING:
+                    scrolling = true;
+                    break;
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) { }
+
+        @TargetApi(11)
+        private void scrollListViewToPositionFromTop(AbsListView view, int position, int duration) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+                view.setSelection(position);
+            } else {
+                view.smoothScrollToPositionFromTop(position, 0, duration);
+            }
         }
     }
 }
