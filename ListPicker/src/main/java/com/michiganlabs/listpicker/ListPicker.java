@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -13,11 +12,10 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
-public class ListPicker extends RelativeLayout implements AdapterView.OnItemClickListener,
+public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemClickListener,
         AdapterView.OnItemLongClickListener {
 
     public interface OnItemSelectedListener {
@@ -130,20 +128,16 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         this.listener = listener;
     }
 
-    public <T> void setItems(List<T> items) {
-        ArrayList<String> itemStrings = new ArrayList<>();
-        for (T item : items) {
-            itemStrings.add(item.toString());
-        }
-        adapter = new ListPickerListAdapter(context, R.layout.list_item, itemStrings);
+    public void setItems(List<T> items) {
+        adapter = new ListPickerListAdapter(context, R.layout.list_item, new ArrayList<>(items));
         listEnd = adapter.getCount() - listStart - 1;
     }
 
-    public <T> T getSelected() {
+    public T getSelected() {
         if (adapter == null) {
             return null;
         }  {
-            return (T) adapter.getItem(firstVisibleItem + paddingItems);
+            return adapter.getItem(firstVisibleItem + paddingItems);
         }
     }
 
@@ -153,6 +147,17 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         } else {
             return firstVisibleItem + paddingItems;
         }
+    }
+
+    public T getItemAtIndex(int index) {
+        if (adapter != null) {
+            if (index >= 0 && index <= listEnd) {
+                return adapter.getItem(index);
+            } else {
+                throw new ArrayIndexOutOfBoundsException();
+            }
+        }
+        return null;
     }
 
     @TargetApi(11)
@@ -168,7 +173,7 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         }
     }
 
-    private class ListPickerListAdapter<T> extends ArrayAdapter<T> {
+    private class ListPickerListAdapter extends ArrayAdapter<T> {
 
         private class ViewHolder {
             TextView text;
@@ -198,6 +203,11 @@ public class ListPicker extends RelativeLayout implements AdapterView.OnItemClic
         @Override
         public long getItemId(int position) {
             return position;
+        }
+
+        @Override
+        public T getItem(int position) {
+            return items.get(position);
         }
 
         @Override
