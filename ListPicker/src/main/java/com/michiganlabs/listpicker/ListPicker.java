@@ -85,7 +85,6 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         setSelectedIndex(position - paddingItems);
-        listView.setItemChecked(position, true);
 
         if (listener != null) {
             listener.onItemSelected(getSelectedIndex());
@@ -121,14 +120,16 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
     public void setItems(List<T> items) {
         adapter = new ListPickerListAdapter(context, R.layout.list_item, new ArrayList<>(items));
+        listView.setAdapter(adapter);
         listEnd = adapter.getCount() - listStart - 1;
+        setSelectedIndex(0);
     }
 
     public T getSelected() {
         if (adapter == null) {
             return null;
         }  {
-            return adapter.getItem(getSelectedIndex() + paddingItems);
+            return getItemAtIndex(getSelectedIndex());
         }
     }
 
@@ -157,6 +158,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         if (index >= listStart && index <= listEnd) {
             firstVisibleItem = index;
             scrollListViewToPositionFromTop(listView, firstVisibleItem - paddingItems, 150);
+            listView.setItemChecked(index, true);
         }
     }
 
