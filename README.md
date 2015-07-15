@@ -1,6 +1,6 @@
 # ListPicker
 
-[![Build Status](https://travis-ci.org/MichiganLabs/ListPicker.svg?branch=v0.1.0)](https://travis-ci.org/MichiganLabs/ListPicker)
+[![Build Status](https://travis-ci.org/MichiganLabs/ListPicker.svg)](https://travis-ci.org/MichiganLabs/ListPicker)
 [![jitpack](https://img.shields.io/github/tag/michiganlabs/listpicker.svg?label=JitPack)](https://jitpack.io/#michiganlabs/listpicker/)
 
 It's like a [`NumberPicker`][numberpicker], but shows a selectable number of items at a time.
@@ -24,6 +24,6 @@ and include `ListPicker` as a dependency:
 
 ```groovy
 dependencies {
-    compile 'com.github.michiganlabs:listpicker:v0.1.0@aar'
+    compile 'com.github.michiganlabs:listpicker:v0.1.1@aar'
 }
 ```
