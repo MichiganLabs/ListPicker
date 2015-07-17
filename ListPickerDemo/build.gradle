@@ -13,6 +13,22 @@ repositories {
     jcenter()
 }
 
+
+// If running on CI environment, apply signing configs from environment
+def envSigningFile = file("$rootProject.projectDir/ListPickerDemo/signing/env.gradle")
+// Otherwise load from local file if possible
+def userSigningFile = file("$rootProject.projectDir/ListPickerDemo/signing/user.gradle")
+if (System.getenv('ANDROID_STORE_PASS') != null) {
+    logger.info('Signing config: using environment variables')
+    apply from: envSigningFile
+} else if (userSigningFile.exists()) {
+    logger.info('Signing config: using user.gradle file')
+    apply from: userSigningFile
+} else {
+    logger.warn('Signing config: No valid signing configuration was found!')
+    logger.warn('Signing config: You will not be able to generate a signed release build!')
+}
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
