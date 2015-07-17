@@ -16,7 +16,7 @@ import java.util.List;
 
 
 public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener {
+    AdapterView.OnItemLongClickListener {
 
     public interface OnItemSelectedListener {
         void onItemSelected(int index);
@@ -122,7 +122,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         adapter = new ListPickerListAdapter(context, R.layout.list_item, new ArrayList<>(items));
         listView.setAdapter(adapter);
         listEnd = adapter.getCount() - listStart - 1;
-        setSelectedIndex(0);
+        setSelectedIndex(0, false);
     }
 
     public T getSelected() {
@@ -153,18 +153,22 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         return null;
     }
 
-    public void setSelectedIndex(int index) {
+    public void setSelectedIndex(int index, boolean smooth) {
         index += listStart;
         if (index >= listStart && index <= listEnd) {
             firstVisibleItem = index;
-            scrollListViewToPositionFromTop(listView, firstVisibleItem - paddingItems, 150);
+            scrollListViewToPositionFromTop(listView, firstVisibleItem - paddingItems, 150, smooth);
             listView.setItemChecked(index, true);
         }
     }
 
+    public void setSelectedIndex(int index) {
+        setSelectedIndex(index, true);
+    }
+
     @TargetApi(11)
-    private void scrollListViewToPositionFromTop(AbsListView view, int position, int duration) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+    private void scrollListViewToPositionFromTop(AbsListView view, int position, int duration, boolean smooth) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB || !smooth) {
             view.setSelection(position);
         } else {
             view.smoothScrollToPositionFromTop(position, 0, duration);
@@ -281,9 +285,9 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
                         int top = Math.abs(itemView.getTop()); // top is a negative value
                         int bottom = Math.abs(itemView.getBottom());
                         if (top >= bottom){
-                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition() + 1, 150);
+                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition() + 1, 150, true);
                         } else {
-                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition(), 150);
+                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition(), 150, true);
                         }
                     }
                     break;
