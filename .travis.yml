@@ -1,8 +1,8 @@
 language: android
 android:
   components:
-    - build-tools-22.0.1
-    - android-22
+    - build-tools-23.0.1
+    - android-23
 sudo: false
 script:
   - ./gradlew clean build --info --stacktrace
@@ -10,3 +10,7 @@ cache:
   directories:
     - $HOME/.gradle
     - $HOME/.m2
+notifications:
+  email:
+    on_success: never
+    on_failure: change
