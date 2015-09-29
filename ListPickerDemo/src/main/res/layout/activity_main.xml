@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:id="@+id/picker"
         app:itemsToShow="11"
-        app:selectionBackground="@android:color/darker_gray"
+        app:selectionBackground="#0099cc"
         app:selectionForeground="@android:color/white"/>
 
 </RelativeLayout>

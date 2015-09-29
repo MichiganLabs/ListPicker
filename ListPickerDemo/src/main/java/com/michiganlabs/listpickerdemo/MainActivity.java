@@ -8,7 +8,7 @@ import com.michiganlabs.listpicker.ListPicker;
 import java.util.ArrayList;
 
 
-public class MainActivity extends Activity implements ListPicker.OnItemSelectedListener{
+public class MainActivity extends Activity implements ListPicker.OnItemSelectedListener {
     ArrayList<String> items = new ArrayList<>();
     ListPicker<String> picker;
 

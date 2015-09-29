@@ -23,6 +23,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
     }
 
     private ListView listView = null;
+    private View highlightView = null;
     private ListPickerListAdapter adapter = null;
     private Context context;
 
@@ -33,8 +34,8 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
     private int paddingItems = 0;
     private int cellHeight;
     private int firstVisibleItem = 0;
-    private int selectionForeground = getResources().getColor(android.R.color.white);
-    private int selectionBackground = getResources().getColor(android.R.color.darker_gray);
+    private int selectionForeground;
+    private int selectionBackground;
 
     private OnItemSelectedListener listener = null;
 
@@ -64,13 +65,13 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         paddingItems = itemsToShow / 2;
         listStart = paddingItems;
 
-        selectionBackground = a.getColor(
-            R.styleable.ListPicker_selectionBackground,
-            android.R.color.darker_gray
-        );
         selectionForeground = a.getColor(
             R.styleable.ListPicker_selectionForeground,
             android.R.color.white
+        );
+        selectionBackground = a.getColor(
+            R.styleable.ListPicker_selectionBackground,
+            android.R.color.darker_gray
         );
         a.recycle();
 
@@ -80,6 +81,9 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
         listView = (ListView) findViewById(R.id.listview);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
+
+        highlightView = findViewById(R.id.highlightView);
+        highlightView.setBackgroundColor(selectionBackground);
     }
 
     @Override
@@ -107,6 +111,10 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
             int height = listView.getHeight();
             cellHeight = height / itemsToShow;
 
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) highlightView.getLayoutParams();
+            params.height = cellHeight;
+            highlightView.setLayoutParams(params);
+
             listView.setFadingEdgeLength(cellHeight);
             listView.setAdapter(adapter);
 
@@ -128,7 +136,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
     public T getSelected() {
         if (adapter == null) {
             return null;
-        }  {
+        } else {
             return getItemAtIndex(getSelectedIndex());
         }
     }
@@ -181,7 +189,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
             TextView text;
         }
 
-        private class EmptyItem {
+        private final class EmptyItem {
             @Override
             public String toString() {
                 return "";
@@ -190,6 +198,7 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
         private ArrayList<T> items;
 
+        @SuppressWarnings("unchecked")
         public ListPickerListAdapter(Context context, int textViewResourceId, ArrayList<T> items) {
             super(context, textViewResourceId, items);
             this.items = items;
@@ -236,12 +245,12 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
 
                 convertView.setTag(viewHolder);
             } else {
+                //noinspection unchecked
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
             if (convertView instanceof CheckableLinearLayout) {
                 CheckableLinearLayout cv = (CheckableLinearLayout) convertView;
-                cv.setSelectionBackgroundColor(selectionBackground);
                 cv.setSelectionTextColor(selectionForeground);
             }
 
@@ -284,11 +293,16 @@ public class ListPicker<T> extends RelativeLayout implements AdapterView.OnItemC
                         View itemView = view.getChildAt(0);
                         int top = Math.abs(itemView.getTop()); // top is a negative value
                         int bottom = Math.abs(itemView.getBottom());
+                        int scrollToPosition;
                         if (top >= bottom){
-                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition() + 1, 150, true);
+                            scrollToPosition = view.getFirstVisiblePosition() + 1;
                         } else {
-                            scrollListViewToPositionFromTop(view, view.getFirstVisiblePosition(), 150, true);
+                            scrollToPosition = view.getFirstVisiblePosition();
                         }
+                        setSelectedIndex(scrollToPosition);
+                        View selected = view.getChildAt(itemsToShow / 2);
+                        listView.performItemClick(selected, scrollToPosition + itemsToShow / 2, selected.getId());
+                        scrollListViewToPositionFromTop(view, scrollToPosition, 150, true);
                     }
                     break;
                 case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
