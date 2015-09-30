@@ -22,7 +22,7 @@ and include `ListPicker` as a dependency:
 
 ```groovy
 dependencies {
-    compile 'com.github.michiganlabs:listpicker:v0.2.0@aar'
+    compile 'com.github.michiganlabs:listpicker:v0.2.1'
 }
 ```
 

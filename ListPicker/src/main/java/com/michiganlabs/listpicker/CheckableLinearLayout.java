@@ -1,14 +1,13 @@
 package com.michiganlabs.listpicker;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class CheckableLinearLayout extends LinearLayout implements Checkable {
-    private Context context;
     private boolean checked = false;
     private int selectionTextColor;
 
@@ -18,11 +17,11 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
 
     public CheckableLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
-        selectionTextColor = ContextCompat.getColor(context, android.R.color.white);
+        //noinspection deprecation
+        selectionTextColor = getResources().getColor(android.R.color.white);
     }
 
-    public void setSelectionTextColor(int color) {
+    public void setSelectionTextColor(@ColorInt int color) {
         selectionTextColor = color;
     }
 
@@ -34,7 +33,8 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
             if (checked) {
                 textView.setTextColor(selectionTextColor);
             } else {
-                textView.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                //noinspection deprecation
+                textView.setTextColor(getResources().getColor(android.R.color.black));
             }
         }
     }
